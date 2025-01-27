@@ -1,6 +1,5 @@
-import { getPublicKey, getEventHash, getSignature, nip19} from 'nostr-tools';
-import { relayPool } from '../config/relayPool';
-import { NostrMessage } from '../config/messageQueue';
+import { getPublicKey, finalizeEvent, nip19 } from 'nostr-tools';
+import { relayPool } from '../config/relayPool.ts';
 import WebSocket from 'ws';
 
 interface NostrEvent {
@@ -14,31 +13,35 @@ interface NostrEvent {
 }
 
 export class NostrService {
-  private privateKey: string;
+  private privateKey: Uint8Array;
 
   constructor(nsec: string) {
-    // Decode nsec to hex private key
+    // Decode nsec to Uint8Array private key
     try {
-      const { data: privateKey } = nip19.decode(nsec);
-      this.privateKey = privateKey as string;
+      const { type, data } = nip19.decode(nsec);
+      if (type === 'nsec' && data instanceof Uint8Array) {
+        this.privateKey = data;
+      } else {
+        throw new Error('Invalid nsec format');
+      }
     } catch (e) {
       throw new Error('Invalid nsec format');
     }
   }
 
-  private async publishToRelay(event: any): Promise<void> {
+  private async publishToRelay(event: NostrEvent): Promise<void> {
     let successCount = 0;
-    const promises = relayPool.map(relay => {
+    const promises = relayPool.map((relay) => {
       return new Promise<void>((resolve, reject) => {
         try {
           const ws = new WebSocket(relay);
           let handled = false;
-          
+
           ws.on('open', () => {
             console.log(`Connected to ${relay}`);
             ws.send(JSON.stringify(['EVENT', event]));
           });
-  
+
           ws.on('message', (message) => {
             const response = JSON.parse(message.toString());
             if (!handled && response[0] === 'OK' && response[1] === event.id) {
@@ -49,7 +52,7 @@ export class NostrService {
               resolve();
             }
           });
-  
+
           ws.on('error', (error) => {
             if (!handled) {
               handled = true;
@@ -58,7 +61,7 @@ export class NostrService {
               reject(error);
             }
           });
-  
+
           setTimeout(() => {
             if (!handled) {
               handled = true;
@@ -72,44 +75,36 @@ export class NostrService {
         }
       });
     });
-  
+
     await Promise.allSettled(promises);
     console.log(`Published to ${successCount}/${relayPool.length} relays`);
   }
 
   async sendNote(content: string, tags: string[][] = []): Promise<void> {
-    const pubkey = getPublicKey(this.privateKey);
-    
-    const event: NostrEvent = {
+    const eventTemplate = {
       kind: 1,
-      pubkey,
+      pubkey: getPublicKey(this.privateKey),
       created_at: Math.floor(Date.now() / 1000),
       tags,
-      content
+      content,
     };
 
-    event.id = getEventHash(event);
-    event.sig = await getSignature(event, this.privateKey);
-
+    const event = finalizeEvent(eventTemplate, this.privateKey);
     await this.publishToRelay(event);
   }
 
   async sendDM(content: string, recipientPubkey: string): Promise<void> {
-    const pubkey = getPublicKey(this.privateKey);
-      
-    const event: NostrEvent = {
+    const eventTemplate = {
       kind: 4,
-      pubkey,
+      pubkey: getPublicKey(this.privateKey),
       created_at: Math.floor(Date.now() / 1000),
       tags: [['p', recipientPubkey]],
-      content: await this.encryptDM(content, recipientPubkey)
+      content: await this.encryptDM(content, recipientPubkey),
     };
-   
-    event.id = getEventHash(event);
-    event.sig = await getSignature(event, this.privateKey);
-   
+
+    const event = finalizeEvent(eventTemplate, this.privateKey);
     await this.publishToRelay(event);
-   }
+  }
 
   private async encryptDM(content: string, recipientPubkey: string): Promise<string> {
     // Implement DM encryption logic here

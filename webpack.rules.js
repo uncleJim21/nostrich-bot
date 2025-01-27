@@ -18,12 +18,19 @@ module.exports = [
   },
   {
     test: /\.tsx?$/,
-    use: {
-      loader: 'babel-loader',
-      options: {
-        exclude: /node_modules/,
-        presets: ['@babel/preset-react']
-      }
-    }
-  }
+    exclude: /node_modules/,
+    use: [
+      {
+        loader: 'babel-loader',
+        options: {
+          presets: [
+            '@babel/preset-env',
+            '@babel/preset-typescript',
+            '@babel/preset-react',
+          ],
+          plugins: ['@babel/plugin-proposal-class-properties'],
+        },
+      },
+    ],
+  },
 ];

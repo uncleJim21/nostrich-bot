@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import { MessageScheduler } from './scheduler/messageScheduler';
+import { MessageScheduler } from './scheduler/messageScheduler.ts';
 import cors from 'cors';
 import path from 'path';
 
@@ -15,8 +15,7 @@ export function createServer() {
     throw new Error('NOSTR_PRIVATE_KEY environment variable is required');
   }
 
-  const queuePath = path.join(__dirname, 'config', 'messageQueue.json');
-  const scheduler = new MessageScheduler(NOSTR_PRIVATE_KEY, queuePath);
+  const scheduler = new MessageScheduler(NOSTR_PRIVATE_KEY);
 
   app.use(cors());
   app.use(express.json());

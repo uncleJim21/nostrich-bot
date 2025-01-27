@@ -1,14 +1,14 @@
-import { NostrService } from '../services/nostrService';
-import { QueueManager } from '../config/queueManager';
+import { NostrService } from '../services/nostrService.ts';
+import { QueueManager } from '../config/queueManager.ts';
 
 
 export class MessageScheduler {
   private nostrService: NostrService;
   public queueManager: QueueManager;
 
-  constructor(privateKey: string, queuePath: string) {
+  constructor(privateKey: string) {
     this.nostrService = new NostrService(privateKey);
-    this.queueManager = new QueueManager(queuePath); // Pass full path from index.ts directly
+    this.queueManager = new QueueManager(); // Pass full path from index.ts directly
 }
 
   async processQueue(): Promise<void> {

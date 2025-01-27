@@ -1,30 +1,32 @@
-import fs from 'fs/promises';
-import { QueuedMessage } from '../types/message';
 import crypto from 'crypto';
+import { QueuedMessage } from '../types/message.ts';
 
 export class QueueManager {
-  private queuePath: string;
   private queue: QueuedMessage[];
 
-  constructor(queuePath: string = './messageQueue.json') {
-    this.queuePath = queuePath;
-    this.queue = [];
+  constructor() {
+    // Initialize the in-memory queue with some default values if needed
+    this.queue = [
+      {
+        id: "1234-5678-90ab-cdef",
+        type: "note",
+        content: "CHADBot is baaaaaaack.",
+        scheduledTime: new Date("2025-01-25T19:30:00.000Z"), // Use a Date object
+        status: "pending",
+        attempts: 0,
+        tags: []
+      }
+    ];
   }
 
+  // Load is a no-op since data is stored in memory
   async load(): Promise<void> {
-    try {
-      const data = await fs.readFile(this.queuePath, 'utf8');
-      const parsed = JSON.parse(data);
-      this.queue = parsed.queue || [];
-    } catch (error) {
-      console.error('Error loading queue:', error);
-      this.queue = [];
-      await this.save();
-    }
+    console.log("QueueManager: Loaded in-memory queue");
   }
 
+  // Save is a no-op since data is stored in memory
   private async save(): Promise<void> {
-    await fs.writeFile(this.queuePath, JSON.stringify({ queue: this.queue }, null, 2));
+    console.log("QueueManager: Saving queue is not required for in-memory storage");
   }
 
   async add(message: Omit<QueuedMessage, 'id' | 'status' | 'attempts'>): Promise<void> {
@@ -35,24 +37,27 @@ export class QueueManager {
       attempts: 0
     };
     this.queue.push(newMessage);
-    await this.save();
+    console.log(`QueueManager: Added message ${JSON.stringify(newMessage, null, 2)}`);
   }
 
   async getPendingMessages(): Promise<QueuedMessage[]> {
-    console.log(`getPendingMessages out of all messages:${JSON.stringify(this.queue,null,2)}`)
-    return this.queue.filter(m => m.status === 'pending');
+    const pendingMessages = this.queue.filter(m => m.status === 'pending');
+    console.log(`QueueManager: Retrieved pending messages ${JSON.stringify(pendingMessages, null, 2)}`);
+    return pendingMessages;
   }
 
   async markAsSent(id: string): Promise<void> {
     const message = this.queue.find(m => m.id === id);
     if (message) {
       message.status = 'sent';
-      await this.save();
+      console.log(`QueueManager: Marked message as sent ${id}`);
+    } else {
+      console.warn(`QueueManager: No message found with id ${id}`);
     }
   }
 
   async removeMessage(id: string): Promise<void> {
     this.queue = this.queue.filter(m => m.id !== id);
-    await this.save();
+    console.log(`QueueManager: Removed message with id ${id}`);
   }
 }
