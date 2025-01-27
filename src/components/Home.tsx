@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import logo from '../../public/logo.png';
+
 
 export default function Home() {
   const [content, setContent] = useState('');
@@ -42,10 +44,11 @@ export default function Home() {
   return (
     <div style={{ textAlign: 'center', padding: '20px', color: '#fff', backgroundColor: '#000' }}>
       <img
-        src="logo.png"
+        src={logo}
         alt="NostrichBot"
         style={{ width: '100px', borderRadius: '50%', marginBottom: '20px' }}
       />
+
       <h1>NostrichBot</h1>
       <p>Scheduled note posts & AI enhancements</p>
 

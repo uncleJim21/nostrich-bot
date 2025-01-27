@@ -33,4 +33,12 @@ module.exports = [
       },
     ],
   },
+  // Add support for image files
+  {
+    test: /\.(png|jpe?g|gif|svg)$/i,
+    type: 'asset/resource', // Use Webpack asset modules
+    generator: {
+      filename: 'images/[hash][ext][query]', // Output directory and file naming
+    },
+  },
 ];
