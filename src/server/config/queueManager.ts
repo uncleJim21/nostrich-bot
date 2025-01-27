@@ -1,63 +1,76 @@
-import crypto from 'crypto';
+import Database from 'better-sqlite3';
 import { QueuedMessage } from '../types/message.ts';
 
 export class QueueManager {
-  private queue: QueuedMessage[];
+  private db: Database;
 
-  constructor() {
-    // Initialize the in-memory queue with some default values if needed
-    this.queue = [
-      {
-        id: "1234-5678-90ab-cdef",
-        type: "note",
-        content: "CHADBot is baaaaaaack.",
-        scheduledTime: new Date("2025-01-25T19:30:00.000Z"), // Use a Date object
-        status: "pending",
-        attempts: 0,
-        tags: []
-      }
-    ];
+  constructor(databasePath: string) {
+    this.db = new Database(databasePath);
   }
 
-  // Load is a no-op since data is stored in memory
   async load(): Promise<void> {
-    console.log("QueueManager: Loaded in-memory queue");
-  }
-
-  // Save is a no-op since data is stored in memory
-  private async save(): Promise<void> {
-    console.log("QueueManager: Saving queue is not required for in-memory storage");
+    console.log('QueueManager: Database is used; no loading needed.');
   }
 
   async add(message: Omit<QueuedMessage, 'id' | 'status' | 'attempts'>): Promise<void> {
-    const newMessage: QueuedMessage = {
-      ...message,
-      id: crypto.randomUUID(),
-      status: 'pending',
-      attempts: 0
-    };
-    this.queue.push(newMessage);
-    console.log(`QueueManager: Added message ${JSON.stringify(newMessage, null, 2)}`);
+    const id = crypto.randomUUID();
+    const query = `
+      INSERT INTO messages (id, type, content, scheduledTime, status, tags)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+    try {
+      this.db.prepare(query).run(
+        id,
+        message.type,
+        message.content,
+        message.scheduledTime.toISOString(),
+        'pending',
+        JSON.stringify(message.tags || [])
+      );
+      console.log(`Message ${id} added to the database.`);
+    } catch (error) {
+      console.error('Error adding message to the database:', error);
+      throw error;
+    }
   }
 
   async getPendingMessages(): Promise<QueuedMessage[]> {
-    const pendingMessages = this.queue.filter(m => m.status === 'pending');
-    console.log(`QueueManager: Retrieved pending messages ${JSON.stringify(pendingMessages, null, 2)}`);
-    return pendingMessages;
+    try {
+      const rows = this.db.prepare(`
+        SELECT * FROM messages WHERE status = 'pending'
+      `).all();
+      return rows.map((row) => ({
+        ...row,
+        scheduledTime: new Date(row.scheduledTime),
+        tags: JSON.parse(row.tags || '[]'),
+      }));
+    } catch (error) {
+      console.error('Error retrieving pending messages:', error);
+      throw error;
+    }
   }
 
   async markAsSent(id: string): Promise<void> {
-    const message = this.queue.find(m => m.id === id);
-    if (message) {
-      message.status = 'sent';
-      console.log(`QueueManager: Marked message as sent ${id}`);
-    } else {
-      console.warn(`QueueManager: No message found with id ${id}`);
+    try {
+      this.db.prepare(`
+        UPDATE messages SET status = 'sent' WHERE id = ?
+      `).run(id);
+      console.log(`Message ${id} marked as sent.`);
+    } catch (error) {
+      console.error(`Error marking message ${id} as sent:`, error);
+      throw error;
     }
   }
 
   async removeMessage(id: string): Promise<void> {
-    this.queue = this.queue.filter(m => m.id !== id);
-    console.log(`QueueManager: Removed message with id ${id}`);
+    try {
+      this.db.prepare(`
+        DELETE FROM messages WHERE id = ?
+      `).run(id);
+      console.log(`Message ${id} removed from the database.`);
+    } catch (error) {
+      console.error(`Error removing message ${id}:`, error);
+      throw error;
+    }
   }
 }

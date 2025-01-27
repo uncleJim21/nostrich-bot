@@ -31,10 +31,10 @@ const createWindow = () => {
   mainWindow.webContents.openDevTools();
 };
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Start the server
   try {
-    server = createServer();
+    server = await createServer() as any;
     console.log('Express server started successfully.');
   } catch (error) {
     console.error('Failed to start Express server:', error);

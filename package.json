@@ -26,6 +26,7 @@
     "@electron-forge/plugin-fuses": "^7.6.1",
     "@electron-forge/plugin-webpack": "^7.6.1",
     "@electron/fuses": "^1.8.0",
+    "@types/better-sqlite3": "^7.6.12",
     "@vercel/webpack-asset-relocator-loader": "1.7.3",
     "babel-loader": "^9.2.1",
     "css-loader": "^6.0.0",
@@ -40,6 +41,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "better-sqlite3": "^11.8.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "electron-squirrel-startup": "^1.0.1",

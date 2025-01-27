@@ -6,9 +6,9 @@ export class MessageScheduler {
   private nostrService: NostrService;
   public queueManager: QueueManager;
 
-  constructor(privateKey: string) {
+  constructor(privateKey: string,dbPath: string) {
     this.nostrService = new NostrService(privateKey);
-    this.queueManager = new QueueManager(); // Pass full path from index.ts directly
+    this.queueManager = new QueueManager(dbPath); // Pass full path from index.ts directly
 }
 
   async processQueue(): Promise<void> {
