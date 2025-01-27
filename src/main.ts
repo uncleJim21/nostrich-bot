@@ -20,7 +20,10 @@ const createWindow = () => {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY, // Provided by Webpack
+      contextIsolation: true,
+      enableRemoteModule: false,
+      nodeIntegration: false,
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY, // Replace with your preload script
     },
   });
 
