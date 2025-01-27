@@ -6,7 +6,6 @@ import { createServer } from './server/createServer.ts'; // Adjust the path base
 
 dotenv.config(); // Load environment variables from .env
 
-
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
@@ -15,7 +14,6 @@ if (started) {
 let server = null;
 
 const createWindow = () => {
-  // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -23,21 +21,29 @@ const createWindow = () => {
       contextIsolation: true,
       enableRemoteModule: false,
       nodeIntegration: false,
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY, // Replace with your preload script
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
   });
 
-  // Load the main HTML or React app.
-  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY); // Provided by Webpack
+  mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "default-src 'self'; connect-src 'self' http://localhost:6001; script-src 'self' 'unsafe-inline' 'unsafe-eval';",
+        ],
+      },
+    });
+  });
 
-  // Open the DevTools.
+  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
   mainWindow.webContents.openDevTools();
 };
 
 app.whenReady().then(async () => {
   // Start the server
   try {
-    server = await createServer() as any;
+    server = await createServer();
     console.log('Express server started successfully.');
   } catch (error) {
     console.error('Failed to start Express server:', error);

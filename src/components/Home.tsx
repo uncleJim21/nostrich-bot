@@ -10,31 +10,34 @@ export default function Home() {
     scheduledTime &&
     new Date(scheduledTime) > new Date();
 
-  const handleSubmit = async () => {
-    try {
-      const response = await fetch(`http://localhost:6001/schedule`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content,
-          scheduledTime,
-          type: 'note',
-          tags: [],
-        }),
-      });
-
-      if (response.ok) {
-        setFeedback({ type: 'success', message: 'Post scheduled successfully!' });
-        setContent('');
-        setScheduledTime('');
-      } else {
-        setFeedback({ type: 'error', message: 'Failed to schedule post.' });
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      setFeedback({ type: 'error', message: 'An error occurred. Please try again.' });
-    }
-  };
+    const handleSubmit = async () => {
+        try {
+          const response = await fetch('http://localhost:6001/schedule', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              content: content,
+              scheduledTime: new Date().toISOString(),
+              type: "note",
+              tags: [],
+            }),
+          });
+      
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+      
+          console.log('Successfully scheduled!');
+          setContent('');
+          setScheduledTime('');
+          setFeedback({ type: 'success', message: 'Post scheduled successfully!' });
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      };
+      
 
   return (
     <div style={{ textAlign: 'center', padding: '20px', color: '#fff', backgroundColor: '#000' }}>

@@ -75,7 +75,11 @@ export async function createServer() {
 
   const scheduler = new MessageScheduler(NOSTR_PRIVATE_KEY,dbPath);
 
-  app.use(cors());
+  app.use(cors({
+    origin: 'http://localhost:3000', // Replace with your frontend's URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type'],
+  }));
   app.use(express.json());
 
   // Run scheduler every 5 minutes
