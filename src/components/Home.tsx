@@ -21,7 +21,7 @@ export default function Home() {
             },
             body: JSON.stringify({
               content: content,
-              scheduledTime: new Date().toISOString(),
+              scheduledTime: scheduledTime,
               type: "note",
               tags: [],
             }),
@@ -42,7 +42,15 @@ export default function Home() {
       
 
   return (
-    <div style={{ textAlign: 'center', padding: '20px', color: '#fff', backgroundColor: '#000' }}>
+    <div
+    style={{
+        textAlign: 'center',
+        padding: '20px',
+        color: '#fff',
+        backgroundColor: '#000',
+        fontFamily: 'Courier, monospace',
+    }}
+    >
       <img
         src={logo}
         alt="NostrichBot"
@@ -85,7 +93,7 @@ export default function Home() {
         <button
           style={{
             padding: '10px 20px',
-            backgroundColor: isScheduleEnabled ? '#6200ea' : '#444',
+            backgroundColor: isScheduleEnabled ? '#AA26C5' : '#444',
             color: '#fff',
             border: 'none',
             borderRadius: '5px',
