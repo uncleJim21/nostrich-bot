@@ -85,6 +85,8 @@ export async function createServer() {
 
   app.post('/schedule', async (req, res) => {
     const { content, scheduledTime, type, tags } = req.body;
+    const NOSTR_PRIVATE_KEY = store.get('nsec');
+
     if (!NOSTR_PRIVATE_KEY) {
       return res.status(400).json({ error: 'No nsec key configured' });
     }

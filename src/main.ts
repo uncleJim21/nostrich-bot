@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import started from 'electron-squirrel-startup';
 import { createServer } from './server/createServer.ts'; 
 import store from './server/config/store.ts';
+import { NostrService } from './server/services/nostrService.ts';
+
 
 
 const iconPath = process.platform === 'win32'
@@ -76,6 +78,16 @@ ipcMain.handle('store-nsec', async (_, nsec: string) => {
 
 ipcMain.handle('get-nsec', async () => {
   return store.get('nsec');
+});
+
+ipcMain.handle('validate-nsec', async (_, nsec: string) => {
+  try {
+    const nostrService = new NostrService();
+    return nostrService.validateNsec(nsec);
+  } catch (error) {
+    console.error('Error validating nsec:', error);
+    return false;
+  }
 });
 
 app.whenReady().then(async () => {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, Settings } from 'lucide-react';
 import SettingsModal from './SettingsModal.tsx';
+
 interface Feedback {
   type: 'success' | 'error';
   message: string;
@@ -13,15 +14,37 @@ export default function Home() {
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [currentNsec, setCurrentNsec] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   // Load saved nsec when component mounts
-  //   window.electron.getNsec().then(savedNsec => {
-  //     if (savedNsec) setCurrentNsec(savedNsec);
-  //   });
-  // }, []);
+  const validateNsec = async (nsec: string) => {
+    try {
+      // Call through IPC instead of directly validating
+      return await window.electron.validateNsec(nsec);
+    } catch (error) {
+      console.error('Error validating nsec:', error);
+      return false;
+    }
+  };
+
+  const loadNsec = async () => {
+    try {
+      if (window.electron?.getNsec) {
+        const savedNsec = await window.electron.getNsec();
+        if (savedNsec) setCurrentNsec(savedNsec);
+      }
+    } catch (error) {
+      console.error('Failed to load nsec:', error);
+    }
+  };
 
   const handleSaveSettings = async (nsec: string) => {
     try {
+      const isValid = await validateNsec(nsec);
+      if(!isValid){
+        setFeedback({ 
+          type: 'error', 
+          message: 'NSEC is not valid.' 
+        });
+        return;
+      }
       await window.electron.storeNsec(nsec);
       setFeedback({ 
         type: 'success', 
@@ -70,6 +93,14 @@ export default function Home() {
       setFeedback({ type: 'error', message: 'Failed to schedule post.' });
     }
   };
+
+  useEffect(() => {
+    loadNsec();
+  }, []);
+
+  useEffect(() => {
+    loadNsec();
+  }, [isSettingsOpen])
 
   return (
     <>
@@ -148,7 +179,7 @@ export default function Home() {
         <button
           style={{
             padding: '10px 20px',
-            backgroundColor: isScheduleEnabled ? '#6200ea' : '#444',
+            backgroundColor: isScheduleEnabled ? '#b800e9' : '#444',
             color: '#fff',
             border: 'none',
             borderRadius: '8px',
