@@ -1,8 +1,17 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow,nativeImage } from 'electron';
 import path from 'node:path';
 import dotenv from 'dotenv';
 import started from 'electron-squirrel-startup';
 import { createServer } from './server/createServer.ts'; // Adjust the path based on your folder structure
+
+const iconPath = process.platform === 'win32'
+  ? path.join(__dirname, 'icons/win/icon.ico')
+  : process.platform === 'darwin'
+    ? path.join(__dirname, 'icons/mac/icon.icns')
+    : path.join(__dirname, 'icons/png/64x64.png');
+console.log('Icon path:', iconPath);
+console.log('Icon exists:', require('fs').existsSync(iconPath));
+
 
 dotenv.config(); // Load environment variables from .env
 
@@ -14,16 +23,32 @@ if (started) {
 let server = null;
 
 const createWindow = () => {
+  // Create the icon
+  const iconPath = path.join(__dirname, 'icons/png/512x512.png');
+  console.log('Loading icon from:', iconPath);
+  console.log('Icon exists:', require('fs').existsSync(iconPath));
+  
+  const icon = nativeImage.createFromPath(iconPath);
+  console.log('Icon is empty:', icon.isEmpty());
+
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    icon: icon,
     webPreferences: {
       contextIsolation: true,
       enableRemoteModule: false,
       nodeIntegration: false,
-      preload: path.join(__dirname, 'preload.js'), // Ensure preload script is set correctly
+      preload: path.join(__dirname, 'preload.js'),
     },
   });
+
+  // Still try setting the window icon explicitly for Linux
+  if (process.platform === 'linux') {
+    mainWindow.setIcon(icon);
+  }
+
+
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 

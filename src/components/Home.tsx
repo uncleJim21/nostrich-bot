@@ -90,7 +90,7 @@ export default function Home() {
       />
       <h1 style={{ fontSize: '2rem', marginBottom: '10px' }}>NostrichBot</h1>
       <p style={{ fontSize: '1rem', marginBottom: '20px' }}>
-        Scheduled note posts & AI enhancements
+        Scheduled note posts & AI assistance
       </p>
 
       {/* Input Section */}

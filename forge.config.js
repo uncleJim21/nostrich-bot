@@ -4,6 +4,7 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 module.exports = {
   packagerConfig: {
     asar: true,
+    icon: './public/icons/png/512x512'
   },
   rebuildConfig: {},
   makers: [
@@ -13,15 +14,25 @@ module.exports = {
     },
     {
       name: '@electron-forge/maker-zip',
-      platforms: ['darwin'],
+      platforms: ['darwin','mac','windows'],
     },
     {
       name: '@electron-forge/maker-deb',
-      config: {},
-    },
-    {
-      name: '@electron-forge/maker-rpm',
-      config: {},
+      config: {
+        options: {
+          icon: './public/icons/png/512x512.png',
+          categories: ['Utility'],
+          mimeType: ['x-scheme-handler/nostrich'],
+          desktop: {
+            Name: 'NostrichBot',
+            Type: 'Application',
+            Comment: 'Nostr Post Scheduler',
+            Icon: 'nostrich-bot',
+            Terminal: false,
+            Categories: 'Utility;'
+          }
+        }
+      }
     },
   ],
   plugins: [
