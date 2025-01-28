@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Menu, Settings } from 'lucide-react';
 import SettingsModal from './SettingsModal.tsx';
-
 interface Feedback {
   type: 'success' | 'error';
   message: string;
@@ -12,10 +11,29 @@ export default function Home() {
   const [scheduledTime, setScheduledTime] = useState('');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [currentNsec, setCurrentNsec] = useState<string | null>(null);
 
-  const handleSaveSettings = (nsec: string) => {
-    // TODO: Implement saving nsec
-    console.log('Saving nsec:', nsec);
+  // useEffect(() => {
+  //   // Load saved nsec when component mounts
+  //   window.electron.getNsec().then(savedNsec => {
+  //     if (savedNsec) setCurrentNsec(savedNsec);
+  //   });
+  // }, []);
+
+  const handleSaveSettings = async (nsec: string) => {
+    try {
+      await window.electron.storeNsec(nsec);
+      setFeedback({ 
+        type: 'success', 
+        message: 'NSEC key saved successfully!' 
+      });
+    } catch (error) {
+      console.error('Failed to save NSEC:', error);
+      setFeedback({ 
+        type: 'error', 
+        message: 'Failed to save NSEC key.' 
+      });
+    }
   };
   
 
@@ -163,11 +181,12 @@ export default function Home() {
     </div>
     {
         isSettingsOpen && (
-            <SettingsModal
-                isOpen={isSettingsOpen}
-                onClose={() => setIsSettingsOpen(false)}
-                onSave={handleSaveSettings}
-            />
+          <SettingsModal
+              isOpen={isSettingsOpen}
+              onClose={() => setIsSettingsOpen(false)}
+              onSave={handleSaveSettings}
+              initialNsec={currentNsec || ''}  // Add this
+          />
         )
       }
     </>

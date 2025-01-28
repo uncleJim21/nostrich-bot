@@ -1,8 +1,10 @@
-import { app, BrowserWindow,nativeImage } from 'electron';
+import { app, BrowserWindow,nativeImage, ipcMain} from 'electron';
 import path from 'node:path';
 import dotenv from 'dotenv';
 import started from 'electron-squirrel-startup';
-import { createServer } from './server/createServer.ts'; // Adjust the path based on your folder structure
+import { createServer } from './server/createServer.ts'; 
+import store from './server/config/store.ts';
+
 
 const iconPath = process.platform === 'win32'
   ? path.join(__dirname, 'icons/win/icon.ico')
@@ -39,7 +41,7 @@ const createWindow = () => {
       contextIsolation: true,
       enableRemoteModule: false,
       nodeIntegration: false,
-      preload: path.join(__dirname, 'preload.js'),
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,  // This constant is provided by webpack
     },
   });
 
@@ -66,6 +68,15 @@ const createWindow = () => {
   mainWindow.webContents.openDevTools();
 };
 
+
+ipcMain.handle('store-nsec', async (_, nsec: string) => {
+  store.set('nsec', nsec);
+  return true;
+});
+
+ipcMain.handle('get-nsec', async () => {
+  return store.get('nsec');
+});
 
 app.whenReady().then(async () => {
   // Start the server

@@ -36,29 +36,30 @@ module.exports = {
     },
   ],
   plugins: [
-    {
-      name: '@electron-forge/plugin-auto-unpack-natives',
-      config: {},
-    },
-    {
-      name: '@electron-forge/plugin-webpack',
-      config: {
-        mainConfig: './webpack.main.config.js',
-        renderer: {
-          config: './webpack.renderer.config.js',
-          entryPoints: [
-            {
-              html: './src/index.html',
-              js: './src/renderer.js',
-              name: 'main_window',
-              preload: {
-                js: './src/preload.js',
+      {
+        name: '@electron-forge/plugin-auto-unpack-natives',
+        config: {},
+      },
+      {
+        name: '@electron-forge/plugin-webpack',
+        config: {
+          mainConfig: './webpack.main.config.js',
+          renderer: {
+            config: './webpack.renderer.config.js',
+            entryPoints: [
+              {
+                html: './src/index.html',
+                js: './src/renderer.js',
+                name: 'main_window',
+                preload: {
+                  js: './src/preload.js',
+                  config: './webpack.preload.config.js'  // Add this line
+                },
               },
-            },
-          ],
+            ],
+          },
         },
       },
-    },
     // Fuses are used to enable/disable various Electron functionality
     // at package time, before code signing the application
     new FusesPlugin({

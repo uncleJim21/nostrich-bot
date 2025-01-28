@@ -6,8 +6,8 @@ export class MessageScheduler {
   private nostrService: NostrService;
   public queueManager: QueueManager;
 
-  constructor(privateKey: string,dbPath: string) {
-    this.nostrService = new NostrService(privateKey);
+  constructor(dbPath: string) {
+    this.nostrService = new NostrService();
     this.queueManager = new QueueManager(dbPath); // Pass full path from index.ts directly
 }
 
@@ -17,7 +17,10 @@ export class MessageScheduler {
     const messages = await this.queueManager.getPendingMessages();
     console.log("Pending messages:", messages);
     const now = new Date();
-    console.log(`processQueue running`)
+    if (!this.nostrService.isReady()) {
+      console.log('NostrService waiting for nsec configuration...'); // Less alarming message
+      return;
+    }
     for (const message of messages) {
       console.log(`message scheduled time:${message.scheduledTime}`)
       if (new Date(message.scheduledTime) <= now) {

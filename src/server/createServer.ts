@@ -1,13 +1,10 @@
 import express from 'express';
 import fs from 'fs';
-import dotenv from 'dotenv';
 import { MessageScheduler } from './scheduler/messageScheduler.ts';
 import cors from 'cors';
 import path from 'path';
 import Database from 'better-sqlite3';
-
-dotenv.config();
-
+import store from './config/store.ts';
 
 
 export async function initializeDatabase(sendTestMessage:Boolean=false): Promise<string> {
@@ -66,14 +63,9 @@ export async function createServer() {
   const dbPath = await initializeDatabase();
   console.log(`createServer initializeDatabase done:${dbPath}`);
   const app = express();
-  const port = process.env.PORT || 3000;
-  const NOSTR_PRIVATE_KEY = process.env.NOSTR_PRIVATE_KEY;
+  const port = 6001;
 
-  if (!NOSTR_PRIVATE_KEY) {
-    throw new Error('NOSTR_PRIVATE_KEY environment variable is required');
-  }
-
-  const scheduler = new MessageScheduler(NOSTR_PRIVATE_KEY,dbPath);
+  const scheduler = new MessageScheduler(dbPath);
 
   app.use(cors({
     origin: 'http://localhost:3000', // Replace with your frontend's URL
@@ -93,6 +85,9 @@ export async function createServer() {
 
   app.post('/schedule', async (req, res) => {
     const { content, scheduledTime, type, tags } = req.body;
+    if (!NOSTR_PRIVATE_KEY) {
+      return res.status(400).json({ error: 'No nsec key configured' });
+    }
     try {
       await scheduler.queueManager.add({
         content,
