@@ -56,18 +56,8 @@ export class NostrService {
     }
   }
 
-  private ensurePrivateKey(): void {
-    if (!this.privateKey) {
-      // Re-try initialization in case nsec was added after construction
-      this.initializePrivateKey();
-      if (!this.privateKey) {
-        throw new Error('NostrService: No valid nsec configured. Please set up your nsec in settings.');
-      }
-    }
-  }
-
   private async publishToRelay(event: NostrEvent): Promise<void> {
-    this.ensurePrivateKey();
+    this.initializePrivateKey();
     let successCount = 0;
     const promises = relayPool.map((relay) => {
       return new Promise<void>((resolve, reject) => {
@@ -119,7 +109,7 @@ export class NostrService {
   }
 
   async sendNote(content: string, tags: string[][] = []): Promise<void> {
-    this.ensurePrivateKey();
+    this.initializePrivateKey();
     const eventTemplate = {
       kind: 1,
       pubkey: getPublicKey(this.privateKey!), // Safe to use ! here because of ensurePrivateKey
@@ -133,7 +123,7 @@ export class NostrService {
   }
 
   async sendDM(content: string, recipientPubkey: string): Promise<void> {
-    this.ensurePrivateKey();
+    this.initializePrivateKey();
     const eventTemplate = {
       kind: 4,
       pubkey: getPublicKey(this.privateKey!),
@@ -147,7 +137,7 @@ export class NostrService {
   }
 
   private async encryptDM(content: string, recipientPubkey: string): Promise<string> {
-    this.ensurePrivateKey();
+    this.initializePrivateKey();
     // Implement DM encryption logic here
     return content;
   }
