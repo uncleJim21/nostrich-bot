@@ -1,75 +1,102 @@
 import React, { useState } from 'react';
-import logo from '../../public/logo.png';
+import { Menu, Settings } from 'lucide-react';
 
+interface Feedback {
+  type: 'success' | 'error';
+  message: string;
+}
 
 export default function Home() {
   const [content, setContent] = useState('');
   const [scheduledTime, setScheduledTime] = useState('');
-  const [feedback, setFeedback] = useState(null);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
 
   const isScheduleEnabled =
     content.trim().length > 0 &&
     scheduledTime &&
     new Date(scheduledTime) > new Date();
 
-    const handleSubmit = async () => {
-        try {
-          const response = await fetch('http://localhost:6001/schedule', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              content: content,
-              scheduledTime: scheduledTime,
-              type: "note",
-              tags: [],
-            }),
-          });
-      
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-      
-          console.log('Successfully scheduled!');
-          setContent('');
-          setScheduledTime('');
-          setFeedback({ type: 'success', message: 'Post scheduled successfully!' });
-        } catch (error) {
-          console.error('Error:', error);
-        }
-      };
-      
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch('http://localhost:6001/schedule', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: content,
+          scheduledTime: new Date().toISOString(),
+          type: 'note',
+          tags: [],
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      console.log('Successfully scheduled!');
+      setFeedback({ type: 'success', message: 'Post scheduled successfully!' });
+      setContent('');
+      setScheduledTime('');
+    } catch (error) {
+      console.error('Error:', error);
+      setFeedback({ type: 'error', message: 'Failed to schedule post.' });
+    }
+  };
 
   return (
     <div
-    style={{
+      style={{
         textAlign: 'center',
         padding: '20px',
         color: '#fff',
         backgroundColor: '#000',
-        fontFamily: 'Courier, monospace',
-    }}
+        position: 'relative',
+        minHeight: '100vh', // Ensures the page takes full height
+        boxSizing: 'border-box',
+      }}
     >
+      {/* Icons in the Top Right */}
+      <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', gap: '15px' }}>
+        <Menu 
+          className="w-8 h-8 cursor-pointer text-white hover:text-gray-300" 
+          onClick={() => console.log('Menu clicked')}
+        />
+        <Settings 
+          className="w-8 h-8 cursor-pointer text-white hover:text-gray-300"
+          onClick={() => console.log('Settings clicked')}
+        />
+      </div>
+
+      {/* Logo */}
       <img
-        src={logo}
+        src={require('../../public/logo.png')}
         alt="NostrichBot"
-        style={{ width: '100px', borderRadius: '50%', marginBottom: '20px' }}
+        style={{
+          width: '120px',
+          borderRadius: '10%',
+          marginBottom: '20px',
+        }}
       />
+      <h1 style={{ fontSize: '2rem', marginBottom: '10px' }}>NostrichBot</h1>
+      <p style={{ fontSize: '1rem', marginBottom: '20px' }}>
+        Scheduled note posts & AI enhancements
+      </p>
 
-      <h1>NostrichBot</h1>
-      <p>Scheduled note posts & AI enhancements</p>
-
+      {/* Input Section */}
       <textarea
         style={{
-          width: '80%',
-          height: '100px',
+          width: '90%',
+          maxWidth: '600px', // Limit width for larger screens
+          height: '120px',
           margin: '20px 0',
           border: '1px solid #444',
-          borderRadius: '5px',
+          borderRadius: '8px',
           padding: '10px',
           backgroundColor: '#222',
           color: '#fff',
+          fontFamily: 'Courier, monospace',
         }}
         placeholder="Start typing your scheduled post here..."
         value={content}
@@ -82,10 +109,11 @@ export default function Home() {
           style={{
             marginRight: '10px',
             padding: '10px',
-            borderRadius: '5px',
+            borderRadius: '8px',
             border: '1px solid #444',
             backgroundColor: '#222',
             color: '#fff',
+            maxWidth: '200px', // Prevent the input from stretching
           }}
           value={scheduledTime}
           onChange={(e) => setScheduledTime(e.target.value)}
@@ -93,11 +121,12 @@ export default function Home() {
         <button
           style={{
             padding: '10px 20px',
-            backgroundColor: isScheduleEnabled ? '#AA26C5' : '#444',
+            backgroundColor: isScheduleEnabled ? '#6200ea' : '#444',
             color: '#fff',
             border: 'none',
-            borderRadius: '5px',
+            borderRadius: '8px',
             cursor: isScheduleEnabled ? 'pointer' : 'not-allowed',
+            fontSize: '1rem',
           }}
           disabled={!isScheduleEnabled}
           onClick={handleSubmit}
@@ -106,14 +135,17 @@ export default function Home() {
         </button>
       </div>
 
+      {/* Feedback Message */}
       {feedback && (
         <div
           style={{
             marginTop: '20px',
-            padding: '10px',
-            borderRadius: '5px',
-            backgroundColor: feedback.type === 'success' ? 'green' : 'red',
+            padding: '15px',
+            borderRadius: '8px',
+            backgroundColor: feedback.type === 'success' ? '#4caf50' : '#f44336',
             color: '#fff',
+            maxWidth: '400px',
+            margin: '20px auto',
           }}
         >
           {feedback.message}

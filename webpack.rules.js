@@ -1,8 +1,6 @@
 module.exports = [
   // Add support for native node modules
   {
-    // We're specifying native_modules in the test because the asset relocator loader generates a
-    // "fake" .node file which is really a cjs file.
     test: /native_modules[/\\].+\.node$/,
     use: 'node-loader',
   },
@@ -33,12 +31,16 @@ module.exports = [
       },
     ],
   },
-  // Add support for image files
+  // Add the rule for image files
   {
     test: /\.(png|jpe?g|gif|svg)$/i,
-    type: 'asset/resource', // Use Webpack asset modules
+    type: 'asset/resource', // Use asset modules for better performance
     generator: {
-      filename: 'images/[hash][ext][query]', // Output directory and file naming
+      filename: 'images/[hash][ext][query]', // Customize output directory
     },
   },
 ];
+
+module.exports.resolve = {
+  extensions: ['.tsx', '.ts', '.js'], // Ensure these extensions are resolved automatically
+};
