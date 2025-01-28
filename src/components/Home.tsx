@@ -102,6 +102,15 @@ export default function Home() {
     loadNsec();
   }, [isSettingsOpen])
 
+  useEffect(() => {
+    const resetFeedback = () => {
+      setFeedback(null);
+    }
+    if(feedback !== null){
+      setTimeout(resetFeedback,5000);
+    }
+  },[feedback])
+
   return (
     <>
     <div
