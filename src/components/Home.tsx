@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Menu, Settings } from 'lucide-react';
+import SettingsModal from './SettingsModal.tsx';
 
 interface Feedback {
   type: 'success' | 'error';
@@ -9,7 +10,14 @@ interface Feedback {
 export default function Home() {
   const [content, setContent] = useState('');
   const [scheduledTime, setScheduledTime] = useState('');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
+
+  const handleSaveSettings = (nsec: string) => {
+    // TODO: Implement saving nsec
+    console.log('Saving nsec:', nsec);
+  };
+  
 
   const isScheduleEnabled =
     content.trim().length > 0 &&
@@ -46,6 +54,7 @@ export default function Home() {
   };
 
   return (
+    <>
     <div
       style={{
         textAlign: 'center',
@@ -53,7 +62,7 @@ export default function Home() {
         color: '#fff',
         backgroundColor: '#000',
         position: 'relative',
-        minHeight: '100vh', // Ensures the page takes full height
+        minHeight: '100vh',
         boxSizing: 'border-box',
       }}
     >
@@ -64,8 +73,8 @@ export default function Home() {
           onClick={() => console.log('Menu clicked')}
         />
         <Settings 
-          className="w-8 h-8 cursor-pointer text-white hover:text-gray-300"
-          onClick={() => console.log('Settings clicked')}
+            className="w-8 h-8 cursor-pointer text-white hover:text-gray-300"
+            onClick={() => setIsSettingsOpen(true)}
         />
       </div>
 
@@ -152,5 +161,15 @@ export default function Home() {
         </div>
       )}
     </div>
+    {
+        isSettingsOpen && (
+            <SettingsModal
+                isOpen={isSettingsOpen}
+                onClose={() => setIsSettingsOpen(false)}
+                onSave={handleSaveSettings}
+            />
+        )
+      }
+    </>
   );
 }
