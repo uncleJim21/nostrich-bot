@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, Settings } from 'lucide-react';
+import NoteListModal from './NoteListModal.tsx';
 import SettingsModal from './SettingsModal.tsx';
 
 interface Feedback {
@@ -13,6 +14,8 @@ export default function Home() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [currentNsec, setCurrentNsec] = useState<string | null>(null);
+  const [isNoteListOpen, setIsNoteListOpen] = useState(false);
+
 
   const validateNsec = async (nsec: string) => {
     try {
@@ -128,7 +131,7 @@ export default function Home() {
       <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', gap: '15px' }}>
         <Menu 
           className="w-8 h-8 cursor-pointer text-white hover:text-gray-300" 
-          onClick={() => console.log('Menu clicked')}
+          onClick={() => setIsNoteListOpen(true)}
         />
         <Settings 
             className="w-8 h-8 cursor-pointer text-white hover:text-gray-300"
@@ -146,8 +149,8 @@ export default function Home() {
           marginBottom: '20px',
         }}
       />
-      <h1 style={{ fontSize: '2rem', marginBottom: '10px' }}>NostrichBot</h1>
-      <p style={{ fontSize: '1rem', marginBottom: '20px' }}>
+      <h1 style={{ fontSize: '2rem', marginBottom: '10px', fontFamily: 'Courier, monospace' }}>NostrichBot</h1>
+      <p style={{ fontSize: '1rem', marginBottom: '20px',fontFamily: 'Courier, monospace' }}>
         Scheduled note posts & AI assistance
       </p>
 
@@ -194,12 +197,32 @@ export default function Home() {
             borderRadius: '8px',
             cursor: isScheduleEnabled ? 'pointer' : 'not-allowed',
             fontSize: '1rem',
+            marginTop:'8px'
           }}
           disabled={!isScheduleEnabled}
           onClick={handleSubmit}
         >
           Schedule
         </button>
+        <button 
+          onClick={() => 
+            setFeedback({ 
+            type: 'success', 
+            message: 'Still a Work in Progress Check Back Later!' 
+          })}
+          style={{
+              padding: '10px 20px',
+              backgroundColor: '#e380ff',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              cursor:'pointer' ,
+              fontSize: '1rem',
+              marginLeft:'8px'
+            }}
+          > 
+            AI Assistance
+          </button>
       </div>
 
       {/* Feedback Message */}
@@ -229,6 +252,13 @@ export default function Home() {
           />
         )
       }
+
+      {isNoteListOpen && (
+        <NoteListModal
+          isOpen={isNoteListOpen}
+          onClose={() => setIsNoteListOpen(false)}
+        />
+      )}
     </>
   );
 }
