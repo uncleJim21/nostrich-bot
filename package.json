@@ -2,7 +2,7 @@
   "name": "nostrich-bot",
   "productName": "nostrich-bot",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "Schedule nostr posts & get AI writing assistance",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",

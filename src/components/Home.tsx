@@ -70,7 +70,7 @@ export default function Home() {
 
     const handleSubmit = async () => {
       try {
-        const response = await fetch('http://localhost:6001/schedule', {
+        const response = await fetch('http://localhost:6002/schedule', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

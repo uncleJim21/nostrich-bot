@@ -4,7 +4,12 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 module.exports = {
   packagerConfig: {
     asar: true,
-    icon: './public/icons/png/512x512'
+    icon: './public/icons/png/512x512',
+    electronPackagerConfig: {
+      win32metadata: {
+        'content-security-policy': "default-src 'self'; connect-src 'self' http://localhost:* ws://localhost:*; script-src 'self' 'unsafe-inline' 'unsafe-eval';"
+      }
+    }
   },
   rebuildConfig: {},
   makers: [

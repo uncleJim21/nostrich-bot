@@ -2,10 +2,12 @@
 <html>
   <head>
     <link rel="icon" type="image/png" href="icons/png/32x32.png">
+    <meta charset="UTF-8" />
     <meta
-      charset="UTF-8"
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; connect-src 'self' http://localhost:6001; script-src 'self' 'unsafe-inline' 'unsafe-eval';"
+      content="default-src 'self'; 
+               connect-src 'self' http://localhost:* ws://localhost:*; 
+               script-src 'self' 'unsafe-inline' 'unsafe-eval';"
     />
     <title>NostrichBot - Nostr Post Scheduler</title>
   </head>

@@ -5,6 +5,8 @@ import started from 'electron-squirrel-startup';
 import { createServer } from './server/createServer.ts'; 
 import store from './server/config/store.ts';
 import { NostrService } from './server/services/nostrService.ts';
+import fetch from 'node-fetch';
+
 
 
 
@@ -38,14 +40,13 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    icon: icon,
-    webPreferences: {
-      contextIsolation: true,
-      enableRemoteModule: false,
-      nodeIntegration: false,
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,  // This constant is provided by webpack
-    },
-  });
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        webSecurity: true,
+        preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
+      }
+    });
 
   // Still try setting the window icon explicitly for Linux
   if (process.platform === 'linux') {
@@ -61,14 +62,25 @@ const createWindow = () => {
       responseHeaders: {
         ...details.responseHeaders,
         'Content-Security-Policy': [
-          "default-src 'self'; connect-src 'self' http://localhost:6001; script-src 'self' 'unsafe-inline' 'unsafe-eval';",
-        ],
-      },
+          "default-src 'self'; connect-src 'self' http://localhost:* ws://localhost:*; script-src 'self' 'unsafe-inline' 'unsafe-eval';"
+        ]
+      }
     });
   });
 
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 };
+
+async function checkServerAndStart() {
+  try {
+    // Try to reach the health endpoint
+    await fetch('http://localhost:6002/health');
+    console.log('Server already running');
+  } catch (error) {
+    console.log('Server not running, starting...');
+    await createServer();
+  }
+}
 
 
 ipcMain.handle('store-nsec', async (_, nsec: string) => {
@@ -93,7 +105,7 @@ ipcMain.handle('validate-nsec', async (_, nsec: string) => {
 app.whenReady().then(async () => {
   // Start the server
   try {
-    server = await createServer();
+    server = await checkServerAndStart();
     console.log('Express server started successfully.');
   } catch (error) {
     console.error('Failed to start Express server:', error);

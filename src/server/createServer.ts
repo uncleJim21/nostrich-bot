@@ -5,37 +5,46 @@ import cors from 'cors';
 import path from 'path';
 import Database from 'better-sqlite3';
 import store from './config/store.ts';
+import { app } from 'electron';
+
+export function getUserDataPath() {
+  // In production, use the app's user data directory
+  if (app.isPackaged) {
+    return path.join(app.getPath('userData'), 'data');
+  }
+  // In development, use the project directory
+  return path.join(__dirname, 'config');
+}
 
 
 export async function initializeDatabase(sendTestMessage:Boolean=false): Promise<string> {
-    // Resolve the absolute path to the database directory and file
-    const dbDir = path.resolve(__dirname, 'config');
-    const dbPath = path.join(dbDir, 'messages.db');
-  
-    // Ensure the directory exists
-    if (!fs.existsSync(dbDir)) {
-      fs.mkdirSync(dbDir, { recursive: true });
-      console.log(`Created directory: ${dbDir}`);
-    }
-  
-    const db = new Database(dbPath);
-    try {
-      db.exec(`
-        CREATE TABLE IF NOT EXISTS messages (
-          id TEXT PRIMARY KEY,
-          type TEXT NOT NULL,
-          content TEXT NOT NULL,
-          scheduledTime TEXT NOT NULL,
-          status TEXT NOT NULL,
-          attempts INTEGER NOT NULL DEFAULT 0,
-          tags TEXT
-        )
-      `);
-      console.log(`Database initialized with messages table at ${dbPath}.`);
-    } catch (error) {
-      console.error('Error initializing database:', error);
-      throw error;
-    }
+  const dataPath = getUserDataPath();
+  const dbPath = path.join(dataPath, 'messages.db');
+
+  // Ensure the directory exists (only create dataPath, not dbDir)
+  if (!fs.existsSync(dataPath)) {
+    fs.mkdirSync(dataPath, { recursive: true });
+    console.log(`Created directory: ${dataPath}`);
+  }
+
+  const db = new Database(dbPath);
+  try {
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS messages (
+        id TEXT PRIMARY KEY,
+        type TEXT NOT NULL,
+        content TEXT NOT NULL,
+        scheduledTime TEXT NOT NULL,
+        status TEXT NOT NULL,
+        attempts INTEGER NOT NULL DEFAULT 0,
+        tags TEXT
+      )
+    `);
+    console.log(`Database initialized with messages table at ${dbPath}.`);
+  } catch (error) {
+    console.error('Error initializing database:', error);
+    throw error;
+  }
 
     if(sendTestMessage){
         const query = `
@@ -63,7 +72,7 @@ export async function createServer() {
   const dbPath = await initializeDatabase();
   console.log(`createServer initializeDatabase done:${dbPath}`);
   const app = express();
-  const port = 6001;
+  const port = 6002;
 
   const scheduler = new MessageScheduler(dbPath);
 

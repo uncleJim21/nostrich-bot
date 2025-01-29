@@ -22,7 +22,7 @@ const NoteListModal = ({ isOpen, onClose }: NoteListModalProps) => {
     const fetchNotes = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:6001/notes');
+        const response = await fetch('http://localhost:6002/notes');
         if (!response.ok) {
           throw new Error('Failed to fetch notes');
         }
@@ -56,7 +56,7 @@ const NoteListModal = ({ isOpen, onClose }: NoteListModalProps) => {
 
   const handleDelete = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:6001/notes/${id}`, {
+      const response = await fetch(`http://localhost:6002/notes/${id}`, {
         method: 'DELETE'
       });
       if (!response.ok) {
