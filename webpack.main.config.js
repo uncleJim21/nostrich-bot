@@ -1,11 +1,22 @@
+const CopyPlugin = require('copy-webpack-plugin');
+const path = require('path');
+
 module.exports = {
-  /**
-   * This is the main entry point for your application, it's the first file
-   * that runs in the main process.
-   */
-  entry: './src/main.js',
-  // Put your normal webpack config below here
+  entry: './src/main.ts',
   module: {
     rules: require('./webpack.rules'),
   },
+  resolve: {
+    extensions: ['.js', '.ts', '.tsx', '.json'],
+  },
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        { 
+          from: path.resolve(__dirname, 'public/icons'),
+          to: path.resolve(__dirname, '.webpack/main/icons')
+        }
+      ]
+    })
+  ]
 };

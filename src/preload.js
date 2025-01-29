@@ -1,2 +1,7 @@
-// See the Electron documentation for details on how to use preload scripts:
-// https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
+const { contextBridge, ipcRenderer } = require('electron');
+
+contextBridge.exposeInMainWorld('electron', {
+  storeNsec: (nsec) => ipcRenderer.invoke('store-nsec', nsec),
+  getNsec: () => ipcRenderer.invoke('get-nsec'),
+  validateNsec: (nsec) => ipcRenderer.invoke('validate-nsec', nsec),
+});

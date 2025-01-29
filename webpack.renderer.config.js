@@ -1,4 +1,5 @@
 const rules = require('./webpack.rules');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 rules.push({
   test: /\.css$/,
@@ -10,4 +11,11 @@ module.exports = {
   module: {
     rules,
   },
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'public', to: 'public' }, // Ensure public folder is copied
+      ],
+    }),
+  ],
 };
