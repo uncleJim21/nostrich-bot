@@ -6,6 +6,9 @@
 - 🕊️ **Buffer for Nostr:** Think of it as Buffer, but designed specifically for the Nostr ecosystem. 🟣🟣
 
 ---
+![image](https://github.com/user-attachments/assets/8ddc57c5-cb26-43fb-8613-924c78ad570a)
+![image](https://github.com/user-attachments/assets/89fb96b7-e2f3-4a5d-b620-4b56bf8b6e19)
+
 
 ## 🔮 Future Work:
 1. 📝 **NIP23/Markdown Support:** Add rich formatting to your posts.
