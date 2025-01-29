@@ -51,13 +51,13 @@ export default function Home() {
       await window.electron.storeNsec(nsec);
       setFeedback({ 
         type: 'success', 
-        message: 'NSEC key saved successfully!' 
+        message: 'nsec saved successfully!' 
       });
     } catch (error) {
-      console.error('Failed to save NSEC:', error);
+      console.error('Failed to save nsec:', error);
       setFeedback({ 
         type: 'error', 
-        message: 'Failed to save NSEC key.' 
+        message: 'Failed to save nsec.' 
       });
     }
   };
@@ -68,34 +68,34 @@ export default function Home() {
     scheduledTime &&
     new Date(scheduledTime) > new Date();
 
-  const handleSubmit = async () => {
-    try {
-      const response = await fetch('http://localhost:6001/schedule', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content: content,
-          scheduledTime: new Date().toISOString(),
-          type: 'note',
-          tags: [],
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+    const handleSubmit = async () => {
+      try {
+        const response = await fetch('http://localhost:6001/schedule', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            content: content,
+            scheduledTime: new Date(scheduledTime).toISOString(), // Use the selected time
+            type: 'note',
+            tags: [],
+          }),
+        });
+    
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    
+        console.log('Successfully scheduled!');
+        setFeedback({ type: 'success', message: 'Post scheduled successfully!' });
+        setContent('');
+        setScheduledTime('');
+      } catch (error) {
+        console.error('Error:', error);
+        setFeedback({ type: 'error', message: 'Failed to schedule post.' });
       }
-
-      console.log('Successfully scheduled!');
-      setFeedback({ type: 'success', message: 'Post scheduled successfully!' });
-      setContent('');
-      setScheduledTime('');
-    } catch (error) {
-      console.error('Error:', error);
-      setFeedback({ type: 'error', message: 'Failed to schedule post.' });
-    }
-  };
+    };
 
   useEffect(() => {
     loadNsec();
@@ -243,22 +243,22 @@ export default function Home() {
       )}
     </div>
     {
-        isSettingsOpen && (
-          <SettingsModal
-              isOpen={isSettingsOpen}
-              onClose={() => setIsSettingsOpen(false)}
-              onSave={handleSaveSettings}
-              initialNsec={currentNsec || ''}  // Add this
-          />
-        )
-      }
-
-      {isNoteListOpen && (
-        <NoteListModal
-          isOpen={isNoteListOpen}
-          onClose={() => setIsNoteListOpen(false)}
+      isSettingsOpen && (
+        <SettingsModal
+            isOpen={isSettingsOpen}
+            onClose={() => setIsSettingsOpen(false)}
+            onSave={handleSaveSettings}
+            initialNsec={currentNsec || ''}  // Add this
         />
-      )}
+      )
+    }
+
+    {isNoteListOpen && (
+      <NoteListModal
+        isOpen={isNoteListOpen}
+        onClose={() => setIsNoteListOpen(false)}
+      />
+    )}
     </>
   );
 }

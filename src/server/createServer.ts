@@ -82,6 +82,7 @@ export async function createServer() {
   app.get('/health', (req, res) => {
     res.send('OK');
   });
+  
 
   app.post('/schedule', async (req, res) => {
     const { content, scheduledTime, type, tags } = req.body;
@@ -101,6 +102,27 @@ export async function createServer() {
     } catch (error) {
       console.error('Failed to schedule post:', error);
       res.status(500).json({ error: 'Failed to schedule post' });
+    }
+  });
+
+  app.get('/notes', async (req, res) => {
+    try {
+      const notes = await scheduler.queueManager.getPendingMessages();
+      res.json(notes);
+    } catch (error) {
+      console.error('Failed to fetch notes:', error);
+      res.status(500).json({ error: 'Failed to fetch notes' });
+    }
+  });
+  
+  // Delete a note
+  app.delete('/notes/:id', async (req, res) => {
+    try {
+      await scheduler.queueManager.removeMessage(req.params.id);
+      res.status(200).json({ message: 'Note deleted successfully' });
+    } catch (error) {
+      console.error('Failed to delete note:', error);
+      res.status(500).json({ error: 'Failed to delete note' });
     }
   });
 

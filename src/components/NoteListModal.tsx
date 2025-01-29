@@ -1,13 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Calendar, Trash2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
+import { QueuedMessage } from '../server/types/message.ts';
 
-interface ScheduledPost {
-  id: string;
-  date: string;
-  time: string;
-  content: string;
-}
+// Create a type for the note as it comes from the server
+type SerializedQueuedMessage = Omit<QueuedMessage, 'scheduledTime'> & {
+  scheduledTime: string;
+};
 
 interface NoteListModalProps {
   isOpen: boolean;
@@ -15,27 +14,58 @@ interface NoteListModalProps {
 }
 
 const NoteListModal = ({ isOpen, onClose }: NoteListModalProps) => {
-  // Static data for now
-  const scheduledPosts: ScheduledPost[] = [
-    {
-      id: '1',
-      date: 'Jan 25',
-      time: '9:47PM',
-      content: 'Lorem ipsem lorem ipsem lorem ipsem...'
-    },
-    {
-      id: '2',
-      date: 'Jan 25',
-      time: '9:47PM',
-      content: 'Lorem ipsem lorem ipsem lorem ipsem...'
+  const [notes, setNotes] = useState<SerializedQueuedMessage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:6001/notes');
+        if (!response.ok) {
+          throw new Error('Failed to fetch notes');
+        }
+        const data = await response.json();
+        setNotes(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load notes');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isOpen) {
+      fetchNotes();
     }
-  ];
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleDelete = (id: string) => {
-    console.log('Delete post:', id);
-    // Will implement actual delete functionality later
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return {
+      date: date.toLocaleDateString('en-US', { month: 'short', day: '2-digit' }),
+      time: date.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit', 
+        hour12: true 
+      })
+    };
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await fetch(`http://localhost:6001/notes/${id}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete note');
+      }
+      setNotes(notes.filter(note => note.id !== id));
+    } catch (err) {
+      console.error('Error deleting note:', err);
+    }
   };
 
   return createPortal(
@@ -104,59 +134,90 @@ const NoteListModal = ({ isOpen, onClose }: NoteListModalProps) => {
             Upcoming Posts
           </h2>
 
-          {/* Posts list */}
+          {/* Content */}
           <div style={{ marginTop: '20px' }}>
-            {scheduledPosts.map((post) => (
-              <div
-                key={post.id}
-                style={{
-                  backgroundColor: '#1a1a1a',
-                  border: '1px solid #333',
-                  borderRadius: '8px',
-                  padding: '16px',
-                  marginBottom: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px'
-                }}
-              >
-                <Calendar style={{
-                        background: 'none',
-                        border: 'none',
-                        padding: '4px',
-                        cursor: 'pointer',
-                        color: '#fff',  // Match the light color from the design
-                    }} size={20} 
-                />
-                <div style={{ flex: 1 }}>
-                  <div style={{ 
-                    color: '#fff',
-                    fontFamily: 'monospace',
-                    marginBottom: '4px'
-                  }}>
-                    {post.date} {post.time}
-                  </div>
-                  <div style={{ 
-                    color: '#999',
-                    fontFamily: 'monospace'
-                  }}>
-                    {post.content}
-                  </div>
-                </div>
-                <button
-                    onClick={() => handleDelete(post.id)}
-                    style={{
-                        background: 'none',
-                        border: 'none',
-                        padding: '4px',
-                        cursor: 'pointer',
-                        color: '#ff0000',  // Match the light color from the design
-                    }}
-                    >
-                    <Trash2 size={20} />
-                </button>
+            {loading ? (
+              <div style={{ 
+                color: '#fff', 
+                fontFamily: 'Courier, monospace',
+                textAlign: 'center',
+                padding: '20px'
+              }}>
+                Loading...
               </div>
-            ))}
+            ) : error ? (
+              <div style={{ 
+                color: '#ff4444', 
+                fontFamily: 'Courier, monospace',
+                textAlign: 'center',
+                padding: '20px'
+              }}>
+                {error}
+              </div>
+            ) : notes.length === 0 ? (
+              <div style={{ 
+                color: '#fff', 
+                fontFamily: 'Courier, monospace',
+                textAlign: 'center',
+                padding: '20px'
+              }}>
+                No upcoming notes
+              </div>
+            ) : (
+              notes.map((note) => {
+                const { date, time } = formatDateTime(note.scheduledTime);
+                return (
+                  <div
+                    key={note.id}
+                    style={{
+                      backgroundColor: '#1a1a1a',
+                      border: '1px solid #333',
+                      borderRadius: '8px',
+                      padding: '16px',
+                      marginBottom: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px'
+                    }}
+                  >
+                    <Calendar style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: '4px',
+                      cursor: 'pointer',
+                      color: '#fff',
+                    }} size={20} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ 
+                        color: '#fff',
+                        fontFamily: 'monospace',
+                        marginBottom: '4px'
+                      }}>
+                        {date} {time}
+                      </div>
+                      <div style={{ 
+                        color: '#999',
+                        fontFamily: 'monospace'
+                      }}>
+                        {note.content}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDelete(note.id)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        padding: '4px',
+                        cursor: 'pointer',
+                        color: '#ff0000',
+                      }}
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
       </div>
