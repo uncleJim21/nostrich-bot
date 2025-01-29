@@ -53,8 +53,6 @@ const createWindow = () => {
     mainWindow.setIcon(icon);
   }
 
-
-
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
@@ -68,7 +66,7 @@ const createWindow = () => {
     });
   });
 
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 };
 
 async function checkServerAndStart() {

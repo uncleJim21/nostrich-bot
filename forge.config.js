@@ -14,12 +14,20 @@ module.exports = {
   rebuildConfig: {},
   makers: [
     {
-      name: '@electron-forge/maker-squirrel',
+      name: '@electron-forge/maker-squirrel', // Windows Installer
+      platforms: ['win32'], 
       config: {},
     },
     {
       name: '@electron-forge/maker-zip',
       platforms: ['darwin','mac','windows'],
+    },
+    {
+      name: '@electron-forge/maker-dmg', // macOS DMG package
+      platforms: ['darwin'],
+      config: {
+        format: 'ULFO', // Ensures compatibility with macOS
+      },
     },
     {
       name: '@electron-forge/maker-deb',

@@ -1,8 +1,9 @@
 import Database from 'better-sqlite3';
+import type { Database as SQLiteDatabase } from 'better-sqlite3';
 import { QueuedMessage } from '../types/message.ts';
 
 export class QueueManager {
-  private db: Database;
+  private db: SQLiteDatabase;
 
   constructor(databasePath: string) {
     this.db = new Database(databasePath);

@@ -962,6 +962,17 @@
   optionalDependencies:
     "electron-installer-debian" "^3.2.0"
 
+"@electron-forge/maker-dmg@^7.6.1":
+  "integrity" "sha512-D7cJRE6CGeovLZhu2dRqUm3w/AlkTURYJYgFuUsgwpBuviQKgJd8quZar6IeZ/l83y4Z1dghKb8D3aAj+bRvNQ=="
+  "resolved" "https://registry.npmjs.org/@electron-forge/maker-dmg/-/maker-dmg-7.6.1.tgz"
+  "version" "7.6.1"
+  dependencies:
+    "@electron-forge/maker-base" "7.6.1"
+    "@electron-forge/shared-types" "7.6.1"
+    "fs-extra" "^10.0.0"
+  optionalDependencies:
+    "electron-installer-dmg" "^5.0.1"
+
 "@electron-forge/maker-rpm@^7.6.1":
   "integrity" "sha512-BShfmto+XTSA01pkZp10r2ktyruVfI24sGC+y4az1vbqkmX2qN9j0Xr+G/ZMHsm76XHju0N/e1Y2pqqu2JM8/A=="
   "resolved" "https://registry.npmjs.org/@electron-forge/maker-rpm/-/maker-rpm-7.6.1.tgz"
@@ -1117,6 +1128,11 @@
     "xterm" "^4.9.0"
     "xterm-addon-fit" "^0.5.0"
     "xterm-addon-search" "^0.8.0"
+
+"@electron-toolkit/preload@^3.0.1":
+  "integrity" "sha512-EzoQmpK8jqqU8YnM5jRe0GJjGVJPke2KtANqz8QtN2JPT96ViOvProBdK5C6riCm0j1T8jjAGVQCZLQy9OVoIA=="
+  "resolved" "https://registry.npmjs.org/@electron-toolkit/preload/-/preload-3.0.1.tgz"
+  "version" "3.0.1"
 
 "@electron/asar@^3.2.1", "@electron/asar@^3.2.13", "@electron/asar@^3.2.5", "@electron/asar@^3.2.7":
   "integrity" "sha512-2XyvMe3N3Nrs8cV39IKELRHTYUWFKrmqqSY1U+GMlc0jvqjIVnoxhNd2H4JolWQncbJi1DCvb5TNxZuI2fEjWg=="
@@ -1639,6 +1655,13 @@
   "integrity" "sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A=="
   "resolved" "https://registry.npmjs.org/@tootallnate/once/-/once-2.0.0.tgz"
   "version" "2.0.0"
+
+"@types/appdmg@^0.5.5":
+  "integrity" "sha512-G+n6DgZTZFOteITE30LnWj+HRVIGr7wMlAiLWOO02uJFWVEitaPU9JVXm9wJokkgshBawb2O1OykdcsmkkZfgg=="
+  "resolved" "https://registry.npmjs.org/@types/appdmg/-/appdmg-0.5.5.tgz"
+  "version" "0.5.5"
+  dependencies:
+    "@types/node" "*"
 
 "@types/better-sqlite3@^7.6.12":
   "integrity" "sha512-fnQmj8lELIj7BSrZQAdBMHEHX8OZLYIHXqAKT1O7tDfLxaINzf00PMjw22r3N/xXh0w/sGHlO6SVaCQ2mj78lg=="
@@ -2842,7 +2865,7 @@
   dependencies:
     "ms" "2.0.0"
 
-"debug@^4.0.1", "debug@^4.1.0", "debug@^4.1.1", "debug@^4.3.1", "debug@^4.3.3", "debug@^4.3.4", "debug@4":
+"debug@^4.0.1", "debug@^4.1.0", "debug@^4.1.1", "debug@^4.3.1", "debug@^4.3.2", "debug@^4.3.3", "debug@^4.3.4", "debug@4":
   "integrity" "sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA=="
   "resolved" "https://registry.npmjs.org/debug/-/debug-4.4.0.tgz"
   "version" "4.4.0"
@@ -3072,6 +3095,17 @@
     "word-wrap" "^1.2.3"
     "yargs" "^16.0.2"
 
+"electron-installer-dmg@^5.0.1":
+  "integrity" "sha512-qOa1aAQdX57C+vzhDk3549dd/PRlNL4F8y736MTD1a43qptD+PvHY97Bo9gSf+OZ8iUWE7BrYSpk/FgLUe40EA=="
+  "resolved" "https://registry.npmjs.org/electron-installer-dmg/-/electron-installer-dmg-5.0.1.tgz"
+  "version" "5.0.1"
+  dependencies:
+    "@types/appdmg" "^0.5.5"
+    "debug" "^4.3.2"
+    "minimist" "^1.2.7"
+  optionalDependencies:
+    "appdmg" "^0.6.4"
+
 "electron-installer-redhat@^3.2.0":
   "integrity" "sha512-gEISr3U32Sgtj+fjxUAlSDo3wyGGq6OBx7rF5UdpIgbnpUvMN4W5uYb0ThpnAZ42VEJh/3aODQXHbFS4f5J3Iw=="
   "resolved" "https://registry.npmjs.org/electron-installer-redhat/-/electron-installer-redhat-3.4.0.tgz"
@@ -3118,7 +3152,7 @@
   optionalDependencies:
     "@electron/windows-sign" "^1.1.2"
 
-"electron@34.0.1":
+"electron@>=13.0.0", "electron@34.0.1":
   "integrity" "sha512-aArw5tAM80i3CKwEREnyZSM1SkARf5Jd1yBMTIdOL4pB1M+p/oDeyWSFI9Dl+vujyfJKiK4SS5+j19wna1onMw=="
   "resolved" "https://registry.npmjs.org/electron/-/electron-34.0.1.tgz"
   "version" "34.0.1"
@@ -4691,7 +4725,7 @@
   dependencies:
     "brace-expansion" "^2.0.1"
 
-"minimist@^1.2.0", "minimist@^1.2.3", "minimist@^1.2.5", "minimist@^1.2.6", "minimist@^1.2.8":
+"minimist@^1.2.0", "minimist@^1.2.3", "minimist@^1.2.5", "minimist@^1.2.6", "minimist@^1.2.7", "minimist@^1.2.8":
   "integrity" "sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA=="
   "resolved" "https://registry.npmjs.org/minimist/-/minimist-1.2.8.tgz"
   "version" "1.2.8"

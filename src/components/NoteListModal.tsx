@@ -188,19 +188,23 @@ const NoteListModal = ({ isOpen, onClose }: NoteListModalProps) => {
                       color: '#fff',
                     }} size={20} />
                     <div style={{ flex: 1 }}>
-                      <div style={{ 
-                        color: '#fff',
-                        fontFamily: 'monospace',
-                        marginBottom: '4px'
-                      }}>
-                        {date} {time}
-                      </div>
-                      <div style={{ 
-                        color: '#999',
-                        fontFamily: 'monospace'
-                      }}>
-                        {note.content}
-                      </div>
+                        <div style={{ 
+                            color: '#fff',
+                            fontFamily: 'monospace',
+                            marginBottom: '4px'
+                        }}>
+                            {date} {time}
+                        </div>
+                        <div style={{ 
+                            color: '#999',
+                            fontFamily: 'monospace',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '400px'  // Adjust this value as needed
+                        }}>
+                            {note.content}
+                        </div>
                     </div>
                     <button
                       onClick={() => handleDelete(note.id)}
